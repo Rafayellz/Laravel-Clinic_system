@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClinicstaffController;
 use App\Http\Controllers\updateProfileController;
 use App\Http\Controllers\ValidateController;
+use App\Http\Controllers\MedicineController;
+
 
 use Illuminate\Support\Facades\Auth;
 
@@ -51,8 +53,8 @@ Route::get('/bookings/{booking}/reschedule', [BookingsController::class, 'resche
 Route::put('/bookings/{booking}/reschedule', [BookingsController::class, 'reschedule'])->name('bookings.reschedule');
 
 //Staff  Clinic Dashboard(Main routes)
-Route::get('/staff_give_medicine', [ClinicstaffController::class, 'staffgivemedicine'])->name('staff_give_medicine');
-Route::get('/staff_inventory_medicine', [ClinicstaffController::class, 'staffinventorymedicine'])->name('staff_inventory_medicine');
+//Route::get('/staff_give_medicine', [MedicineController::class, 'showGiveMedicineForm'])->name('staff_give_medicine');
+//Route::get('/staff_inventory_medicine', [ClinicstaffController::class, 'staffinventorymedicine'])->name('staff_inventory_medicine');
 Route::get('/staff_profile', [ClinicstaffController::class, 'staffprofile'])->name('staff_profile');
 Route::get('/staff_notifications', [ClinicstaffController::class, 'staffnotifications'])->name('staff_notifications');
 Route::get('/staff_reports', [ClinicstaffController::class, 'staffreports'])->name('staff_reports');
@@ -70,6 +72,46 @@ Route::post('/bookings/{booking}/approve', [BookingsController::class, 'approve'
 Route::post('/bookings/{booking}/reject', [BookingsController::class, 'reject'])->name('bookings.reject');
 
 });
+
+
+//Medicine Inventory Route
+Route::middleware(['auth'])->group(function(){
+     // Display inventory
+    Route::get('/staff/inventory-medicine', [MedicineController::class, 'index'])
+        ->name('staff_inventory_medicine');
+    
+    // Add medicine
+    Route::post('/staff/inventory-medicine', [MedicineController::class, 'store'])
+        ->name('medicine.store');
+
+    // Show edit form
+    Route::get('/staff/inventory-medicine/{medicine}/edit', [MedicineController::class, 'edit'])
+    ->name('medicine.edit');
+    
+    // Update medicine
+    Route::put('/staff/inventory-medicine/{medicine}', [MedicineController::class, 'update'])
+        ->name('medicine.update');
+    
+    // Update stock
+    Route::post('/staff/inventory-medicine/update-stock', [MedicineController::class, 'updateStock'])
+        ->name('medicine.updateStock');
+    
+    // Delete medicine
+    Route::delete('/staff/inventory-medicine/{medicine}', [MedicineController::class, 'destroy'])
+        ->name('medicine.destroy');
+});
+
+// Give Medicine Routes
+Route::middleware(['auth'])->group(function () {
+    // Show give medicine form (GET)
+    Route::get('/staff_give_medicine', [MedicineController::class, 'showGiveMedicineForm'])
+        ->name('staff_give_medicine');
+    
+    // Process giving medicine (POST)
+    Route::post('/staff_give_medicine', [MedicineController::class, 'giveMedicine'])
+        ->name('medicine.give');
+});
+
 
 // Logout Route
 Route::post('/logout', function () {

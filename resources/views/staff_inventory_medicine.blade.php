@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Clinic Appointment System - Medicine Inventory</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -93,16 +94,22 @@
         .badge-low {
             background-color: #fff3cd;
             color: #856404;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .badge-normal {
             background-color: var(--light-green);
             color: var(--dark-green);
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .badge-expired {
             background-color: #f8d7da;
             color: #721c24;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .welcome-card {
@@ -155,7 +162,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-     <div class="sidebar">
+    <div class="sidebar">
         <div class="logo">
             <img src="{{ asset('img/DNSC_LOGO.png') }}" alt="DNSC Logo" class="img-fluid">
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
@@ -169,14 +176,10 @@
                 <i class="bi bi-capsule"></i>
                 <span>Give Medicine</span>
             </a>
-            <a class="nav-link  active" href="{{ route('staff_inventory_medicine') }}">
+            <a class="nav-link active" href="{{ route('staff_inventory_medicine') }}">
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <!-- <a class="nav-link" href="{{ route('staff_profile') }}">
-                <i class="bi bi-person-circle"></i>
-                <span>Profile</span>
-            </a> -->
             <a class="nav-link" href="{{ route('staff_reports') }}">
                 <i class="bi bi-bar-chart"></i>
                 <span>Reports</span>
@@ -207,19 +210,38 @@
                     </div>
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://ui-avatars.com/api/?name=Staff+User&background=28a745&color=fff" alt="Staff" class="rounded-circle me-2" width="32" height="32">
-                            <span class="d-none d-md-inline">Staff User</span>
+                            <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name ?? 'Staff User' }}&background=28a745&color=fff" alt="Staff" class="rounded-circle me-2" width="32" height="32">
+                            <span class="d-none d-md-inline">{{ auth()->user()->name ?? 'Staff User' }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{{ route('staff_profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-                            <!-- <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li> -->
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="index.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 </div>
             </div>
         </nav>
+
+        <!-- Flash Messages -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
         <!-- Welcome Card -->
         <div class="card welcome-card mb-4">
@@ -252,20 +274,20 @@
         <!-- Medicine Inventory Table -->
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title d-flex justify-content-between align-items-center">
-                    Medicine Inventory
-                    <div class="input-group" style="width: 250px;">
-                        <input type="text" class="form-control" placeholder="Search medicine...">
-                        <button class="btn btn-outline-success" type="button">
+                <h5 class="card-title d-flex justify-content-between align-items-center flex-wrap">
+                    <span>Medicine Inventory ({{ $medicines->count() }} items)</span>
+                    <form action="{{ route('staff_inventory_medicine') }}" method="GET" class="input-group" style="width: 250px;">
+                        <input type="text" name="search" class="form-control" placeholder="Search medicine..." value="{{ request('search') }}">
+                        <button class="btn btn-outline-success" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
-                    </div>
+                    </form>
                 </h5>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Medicine ID</th>
+                                <th>ID</th>
                                 <th>Medicine Name</th>
                                 <th>Category</th>
                                 <th>Stock</th>
@@ -275,201 +297,178 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($medicines as $medicine)
                             <tr>
-                                <td>001</td>
-                                <td>Paracetamol 500mg</td>
-                                <td>Pain Relief</td>
-                                <td>125</td>
-                                <td>2024-05-15</td>
-                                <td><span class="badge badge-normal">Normal</span></td>
+                                <td>{{ str_pad($medicine->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                <td>{{ $medicine->name }}</td>
+                                <td>{{ $medicine->category }}</td>
+                                <td>{{ $medicine->stock }}</td>
+                                <td>{{ date('d-m-Y', strtotime($medicine->expiry_date)) }}</td>  
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    <span class="badge {{ $medicine->status_badge }}">
+                                        {{ $medicine->status_text }}
+                                    </span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>Amoxicillin 250mg</td>
-                                <td>Antibiotic</td>
-                                <td>42</td>
-                                <td>2024-03-20</td>
-                                <td><span class="badge badge-low">Low Stock</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ route('medicine.edit', $medicine) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>Vitamin C 100mg</td>
-                                <td>Supplement</td>
-                                <td>89</td>
-                                <td>2024-08-10</td>
-                                <td><span class="badge badge-normal">Normal</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>004</td>
-                                <td>Ibuprofen 400mg</td>
-                                <td>Pain Relief</td>
-                                <td>15</td>
-                                <td>2024-02-28</td>
-                                <td><span class="badge badge-expired">Expired</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>005</td>
-                                <td>Cetirizine 10mg</td>
-                                <td>Allergy</td>
-                                <td>67</td>
-                                <td>2024-11-05</td>
-                                <td><span class="badge badge-normal">Normal</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>006</td>
-                                <td>Omeprazole 20mg</td>
-                                <td>Antacid</td>
-                                <td>32</td>
-                                <td>2023-12-01</td>
-                                <td><span class="badge badge-expired">Expired</span></td>
-                                <td>
-                                    <a href="edit-medicine.html" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i> Edit
                                     </a>
-                                    <a href="delete-medicine.html" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </a>
+                                    <form action="{{ route('medicine.destroy', $medicine) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
+
+                            <!-- Edit Modal for each medicine -->
+                            <div class="modal fade" id="editMedicineModal{{ $medicine->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ route('medicine.update', $medicine) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Medicine</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="editName{{ $medicine->id }}" class="form-label">Medicine Name</label>
+                                                    <input type="text" class="form-control" name="name" value="{{ $medicine->name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editCategory{{ $medicine->id }}" class="form-label">Category</label>
+                                                    <input type="text" class="form-control" name="category" value="{{ $medicine->category }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editStock{{ $medicine->id }}" class="form-label">Stock</label>
+                                                    <input type="number" class="form-control" name="stock" value="{{ $medicine->stock }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="editExpiry{{ $medicine->id }}" class="form-label">Expiry Date</label>
+                                                    <input type="date" class="form-control" name="expiry_date" value="{{ date('Y-m-d', strtotime($medicine->expiry_date)) }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Update Medicine</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                                    <p class="text-muted mt-2">No medicines found in inventory</p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                <nav aria-label="Medicine inventory pagination">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
 
     <!-- Add Medicine Modal -->
-    <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addMedicineModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMedicineModalLabel">Add New Medicine</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
+                <form action="{{ route('medicine.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Medicine</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label for="medicineName" class="form-label">Medicine Name</label>
-                            <input type="text" class="form-control" id="medicineName" required>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="medicineCategory" class="form-label">Category</label>
-                            <select class="form-select" id="medicineCategory" required>
+                            <select class="form-select @error('category') is-invalid @enderror" name="category" required>
                                 <option value="" selected disabled>Select Category</option>
-                                <option value="pain-relief">Pain Relief</option>
-                                <option value="antibiotic">Antibiotic</option>
-                                <option value="supplement">Supplement</option>
-                                <option value="allergy">Allergy</option>
-                                <option value="other">Other</option>
+                                <option value="Pain Relief">Pain Relief</option>
+                                <option value="Antibiotic">Antibiotic</option>
+                                <option value="Supplement">Supplement</option>
+                                <option value="Allergy">Allergy</option>
+                                <option value="Antacid">Antacid</option>
+                                <option value="Other">Other</option>
                             </select>
+                            @error('category')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="initialStock" class="form-label">Initial Stock</label>
-                            <input type="number" class="form-control" id="initialStock" required>
+                            <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" required min="0">
+                            @error('stock')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="expiryDate" class="form-label">Expiry Date</label>
-                            <input type="date" class="form-control" id="expiryDate" required>
+                            <input type="date" class="form-control @error('expiry_date') is-invalid @enderror" name="expiry_date" required>
+                            @error('expiry_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success">Add Medicine</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Add Medicine</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- Update Stock Modal -->
-    <div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateStockModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateStockModalLabel">Update Medicine Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
+                <form action="{{ route('medicine.updateStock') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Medicine Stock</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label for="selectMedicine" class="form-label">Select Medicine</label>
-                            <select class="form-select" id="selectMedicine" required>
+                            <select class="form-select" name="medicine_id" required>
                                 <option value="" selected disabled>Select Medicine</option>
-                                <option value="paracetamol">Paracetamol 500mg</option>
-                                <option value="amoxicillin">Amoxicillin 250mg</option>
-                                <option value="vitamin-c">Vitamin C 100mg</option>
-                                <option value="ibuprofen">Ibuprofen 400mg</option>
-                                <option value="cetirizine">Cetirizine 10mg</option>
+                                @foreach($medicines as $medicine)
+                                    <option value="{{ $medicine->id }}">{{ $medicine->name }} (Current: {{ $medicine->stock }})</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="stockChange" class="form-label">Stock Change</label>
-                            <input type="number" class="form-control" id="stockChange" required>
+                            <input type="number" class="form-control" name="stock_change" required>
                             <div class="form-text">Enter positive number to add stock, negative to remove.</div>
                         </div>
                         <div class="mb-3">
                             <label for="reason" class="form-label">Reason</label>
-                            <textarea class="form-control" id="reason" rows="2"></textarea>
+                            <textarea class="form-control" name="reason" rows="2"></textarea>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success">Update Stock</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Update Stock</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

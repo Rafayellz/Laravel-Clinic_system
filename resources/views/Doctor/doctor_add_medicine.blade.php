@@ -135,34 +135,37 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_appointments') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
                 <i class="bi bi-calendar-check"></i>
                 <span>Manage Appointments</span>
             </a> 
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_manage_users') }}">  <!-- -->
                 <i class="bi bi-people"></i>
                 <span>Manage Users</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_reports') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_reports') }}">  <!-- -->
                 <i class="bi bi-bar-chart"></i> 
                 <span>Reports</span>
             </a>
-            <a class="nav-link active" href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link active" href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
-            <a class="nav-link" href="index.html">   <!-- -->
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
+            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                @csrf
+                <button type="submit" class="nav-link" style="border:none; background:none; width:100%; text-align:left; padding:var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x); cursor:pointer;">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span> 
+                </button>
+            </form>
         </nav>
     </div>
 
@@ -231,7 +234,7 @@
                     </div>
                     
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('admin_medicine_inventory') }}" class="btn btn-secondary me-2">
+                        <a href="{{ route('doctor_medicine_inventory') }}" class="btn btn-secondary me-2">
                             <i class="bi bi-arrow-left me-2"></i>Back to Inventory
                         </a>
                         <button type="submit" class="btn btn-success">

@@ -13,7 +13,7 @@ class Bookings extends Model
         'doctor',
         'service_type',
         'reason',
-        'status'
+        'status'    
     ];
 
     protected $casts = [

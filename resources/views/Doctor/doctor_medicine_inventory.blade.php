@@ -143,27 +143,23 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_appointments') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
                 <i class="bi bi-calendar-check"></i>
                 <span>Manage Appointments</span>
             </a> 
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
-                <i class="bi bi-people"></i>
-                <span>Manage Users</span>
-            </a>
-            <a class="nav-link" href="{{ route('admin_reports') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_reports') }}">  <!-- -->
                 <i class="bi bi-bar-chart"></i> 
                 <span>Reports</span>
             </a>
-            <a class="nav-link active   " href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link active   " href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
@@ -209,7 +205,7 @@
                 <h2>Medicine Inventory</h2>
                 <p class="text-muted mb-0">Manage all medicines in the clinic inventory</p>
             </div>
-            <a href="{{ route('admin_add_medicine') }}" class="btn btn-success">
+            <a href="{{ route('doctor_add_medicine') }}" class="btn btn-success">
                 <i class="bi bi-plus-circle me-2"></i>Add Medicine
             </a>
         </div>

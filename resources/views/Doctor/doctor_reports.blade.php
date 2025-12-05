@@ -158,27 +158,23 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_appointments') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
                 <i class="bi bi-calendar-check"></i>
                 <span>Manage Appointments</span>
             </a> 
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
-                <i class="bi bi-people"></i>
-                <span>Manage Users</span>
-            </a>
-            <a class="nav-link active" href="{{ route('admin_reports') }}">  <!-- -->
+            <a class="nav-link active" href="{{ route('doctor_reports') }}">  <!-- -->
                 <i class="bi bi-bar-chart"></i> 
                 <span>Reports</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
@@ -204,8 +200,8 @@
                     </div>
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=28a745&color=fff" alt="Admin" class="rounded-circle me-2" width="32" height="32">
-                            <span class="d-none d-md-inline">Admin User</span>
+                            <img src="https://ui-avatars.com/api/?name={{ Auth::user()->first_name }}&background=28a745&color=fff" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                            <span class="d-none d-md-inline">{{ Auth::user()->first_name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
@@ -490,5 +486,7 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

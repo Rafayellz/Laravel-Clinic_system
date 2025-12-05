@@ -11,12 +11,12 @@ use App\Models\Bookings;
 class UserController extends Controller
 {   
 
-    public function login1(){
-        return view('test_login');
+    public function login(){
+        return view('login');
     }
      
-    public function register1(){
-        return view('test_register');
+    public function register(){
+        return view('register');
     }
 
     //fetch user data for dashboard and all views that require user data

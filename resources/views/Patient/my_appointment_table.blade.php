@@ -141,7 +141,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
+                            <i class="fas fa-user-circle"></i> {{ $patient->first_name }} {{ $patient->last_name}}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
@@ -174,12 +174,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('bookappointment') }}">
+                            <a class="nav-link" href="{{ route('book_appointment') }}">
                                 <i class="fas fa-calendar-plus"></i> Book Appointment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('myappointment') }}">
+                            <a class="nav-link active" href="{{ route('my_appointment') }}">
                                 <i class="fas fa-calendar-check"></i> My Appointments
                             </a>
                         </li>
@@ -211,7 +211,7 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">My Appointments</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="{{ route('bookappointment') }}" class="btn btn-primary-custom btn-lg">
+                        <a href="{{ route('book_appointment') }}" class="btn btn-primary-custom btn-lg">
                             <i class="fas fa-calendar-plus me-2"></i>Book New Appointment
                         </a>
                     </div>
@@ -228,10 +228,10 @@
                 <!-- View Toggle -->
                 <div class="d-flex justify-content-end mb-3">
                     <div class="btn-group" role="group">
-                        <a href="{{ route('myappointment') }}" class="btn btn-outline-success">
+                        <a href="{{ route('my_appointment') }}" class="btn btn-outline-success">
                             <i class="fas fa-th-large me-2"></i>Card View
                         </a>
-                        <a href="{{ route('myappointmenttable') }}" class="btn btn-outline-success active">
+                        <a href="{{ route('my_appointmenttable') }}" class="btn btn-outline-success active">
                             <i class="fas fa-list me-2"></i>Table View
                         </a>
                     </div>
@@ -244,7 +244,7 @@
                             <i class="fas fa-calendar-times"></i>
                             <h5 class="mt-3">No Appointments Yet</h5>
                             <p class="text-muted">You haven't booked any appointments. Click the button below to schedule one.</p>
-                            <a href="{{ route('bookappointment') }}" class="btn btn-primary-custom mt-3">
+                            <a href="{{ route('book_appointment') }}" class="btn btn-primary-custom mt-3">
                                 <i class="fas fa-calendar-plus me-2"></i>Book Your First Appointment
                             </a>
                         </div>

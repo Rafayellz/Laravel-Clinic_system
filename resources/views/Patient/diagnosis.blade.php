@@ -217,7 +217,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> {{ $user->first_name }} {{ $user->last_name}}
+                            <i class="fas fa-user-circle"></i> {{ $patient->first_name }} {{ $patient->last_name}}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
@@ -243,12 +243,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('bookappointment') }}">
+                            <a class="nav-link" href="{{ route('book_appointment') }}">
                                 <i class="fas fa-calendar-plus"></i> Book Appointment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('myappointment') }}">
+                            <a class="nav-link" href="{{ route('my_appointment') }}">
                                 <i class="fas fa-calendar-check"></i> My Appointments
                             </a>
                         </li>
@@ -275,9 +275,6 @@
                                     <span>Logout</span> 
                                 </button>
                             </form>
-                            <!-- <a class="nav-link" href="index.html">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a> -->
                         </li>
                     </ul>
                 </div>
@@ -300,10 +297,16 @@
                     <div class="col-lg-3 col-md-6 mb-3">
                         <div class="health-stat">
                             <div class="health-stat-label">
-                                <i class="fas fa-heartbeat me-1"></i> Blood Pressure
+                                <i class="fas fa-birthday-cake me-1"></i> Age
                             </div>
-                            <div class="health-stat-value">120/80</div>
-                            <small class="text-muted">Normal</small>
+                            <div class="health-stat-value">{{ $user->age ?? 'N/A' }}</div>
+                            <small class="text-muted">
+                                @if($user->date_of_birth)
+                                    Born: {{ \Carbon\Carbon::parse($user->date_of_birth)->format('M d, Y') }}
+                                @else
+                                    Not set
+                                @endif
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 mb-3">
@@ -311,8 +314,14 @@
                             <div class="health-stat-label">
                                 <i class="fas fa-weight me-1"></i> Weight
                             </div>
-                            <div class="health-stat-value" style="color: #007bff;">68 kg</div>
-                            <small class="text-muted">Healthy</small>
+                            <div class="health-stat-value" style="color: #007bff;">{{ $user->weight ?? 'N/A' }} kg</div>
+                            <small class="text-muted">
+                                @if($user->weight)
+                                    Last updated: {{ $user->updated_at->format('M d, Y') }}
+                                @else
+                                    Not set
+                                @endif
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 mb-3">
@@ -320,8 +329,14 @@
                             <div class="health-stat-label">
                                 <i class="fas fa-ruler-vertical me-1"></i> Height
                             </div>
-                            <div class="health-stat-value" style="color: #ffc107;">172 cm</div>
-                            <small class="text-muted">Last updated: Mar 1, 2025</small>
+                            <div class="health-stat-value" style="color: #ffc107;">{{ $user->height ?? 'N/A' }} cm</div>
+                            <small class="text-muted">
+                                @if($user->height)
+                                    Last updated: {{ $user->updated_at->format('M d, Y') }}
+                                @else
+                                    Not set
+                                @endif
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 mb-3">
@@ -329,29 +344,37 @@
                             <div class="health-stat-label">
                                 <i class="fas fa-file-medical me-1"></i> Total Records
                             </div>
-                            <div class="health-stat-value" style="color: #17a2b8;">12</div>
-                            <small class="text-muted">Since 2023</small>
+                            <div class="health-stat-value" style="color: #17a2b8;">{{ $bookings->count() }}</div>
+                            <small class="text-muted">Since {{ $user->created_at->format('Y') }}</small>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Search and Filter -->
-                <div class="row mb-4">
+               <div class="row mb-4">
+                <form method="GET" action="{{ route('diagnosis') }}" class="w-100">
                     <div class="col-md-8">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" placeholder="Search by diagnosis, doctor, or date...">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Search by diagnosis, doctor, or date..."
+                                value="{{ $search ?? '' }}"
+                            >
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <select class="form-select">
-                            <option selected>All Records</option>
-                            <option>This Year</option>
-                            <option>Last 6 Months</option>
-                            <option>Last 3 Months</option>
+                        <select name="filter" class="form-select" onchange="this.form.submit()">
+                            <option value="all" {{ $filter === 'all' ? 'selected' : '' }}>All Records</option>
+                            <option value="this_year" {{ $filter === 'this_year' ? 'selected' : '' }}>This Year</option>
+                            <option value="last_6_months" {{ $filter === 'last_6_months' ? 'selected' : '' }}>Last 6 Months</option>
+                            <option value="last_3_months" {{ $filter === 'last_3_months' ? 'selected' : '' }}>Last 3 Months</option>
                         </select>
                     </div>
-                </div>
+                </form>
+            </div>
 
                 <!-- Current Prescriptions -->
                 <div class="card">
@@ -396,7 +419,7 @@
                     </div>
                 </div>
 
-                <!-- Medical Records Timeline -->
+                <!-- Medical Records Timeline -->           
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-history text-primary me-2"></i>
@@ -404,162 +427,118 @@
                     </div>
                     <div class="card-body">
                         <div class="timeline">
-                            
-                            <!-- Record 1 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Upper Respiratory Tract Infection</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>October 10, 2025</small>
+                            @forelse($bookings as $booking)
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="record-card">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h5 class="mb-1">
+                                                    {{ $booking->reason ?? 'Appointment' }}
+                                                </h5>
+                                                <small class="text-muted">
+                                                    <i class="far fa-calendar me-1"></i>
+                                                    {{  $booking->appointment_date->format('l, F j, Y')  }}
+                                                </small>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal{{ $booking->id }}">
+                                                <i class="fas fa-eye me-1"></i>View Details
+                                            </button>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal1">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Maria Santos</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>Cough, sore throat, mild fever
-                                    </p>
-                                    <div class="mt-2">
-                                        <small class="text-muted"><i class="fas fa-prescription me-1"></i>Prescriptions:</small><br>
-                                        <span class="prescription-badge">Amoxicillin 500mg</span>
-                                        <span class="prescription-badge">Paracetamol 500mg</span>
+                                        <p class="mb-2">
+                                            <i class="fas fa-user-md me-2 text-success"></i>
+                                            <strong>{{ $booking->doctor ?? 'N/A' }}</strong>
+                                        </p>
+                                        <p class="mb-2">
+                                            <i class="fas fa-notes-medical me-2 text-info"></i>
+                                            {{ $booking->service_name }}
+                                        </p>
+                                        <div class="mt-2">
+                                            <span class="badge bg-info">{{ ucfirst($booking->status) }}</span>
+                                            <small class="text-muted ms-2">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ \Carbon\Carbon::parse($booking->appointment_time)->format('h:i A') }}
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Record 2 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Allergic Rhinitis</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>October 5, 2025</small>
+                                <!-- Modal for each booking -->
+                                <div class="modal fade" id="recordModal{{ $booking->id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color: var(--primary-green); color: white;">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-file-medical me-2"></i>Appointment Details
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Appointment ID:</strong> APP-{{ $booking->id }}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->appointment_date)->format('F d, Y') }}
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <strong>Patient:</strong> {{ $user->first_name }} {{ $user->last_name }}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->appointment_time)->format('h:i A') }}
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Doctor:</strong><br>
+                                                    <span class="text-success">
+                                                        <i class="fas fa-user-md me-1"></i>
+                                                        {{ $booking->doctor ?? 'N/A' }}
+                                                    </span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Service Type:</strong><br>
+                                                    <span class="diagnosis-tag">{{ $booking->service_type ?? 'N/A' }}</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Reason for Visit:</strong><br>
+                                                    <p class="mt-1">{{ $booking->reason ?? 'No reason provided' }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Status:</strong><br>
+                                                    @if ($booking->status === 'pending')
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    @elseif ($booking->status === 'approved')
+                                                        <span class="badge bg-success">Approved</span>
+                                                    @elseif ($booking->status === 'rescheduled')
+                                                        <span class="badge bg-info">Rescheduled</span>
+                                                    @elseif ($booking->status === 'rejected')
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                    @elseif ($booking->status === 'completed')
+                                                        <span class="badge bg-primary">Completed</span>
+                                                    @endif
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Booked On:</strong><br>
+                                                    <p class="mt-1">{{ $booking->created_at->format('F d, Y \a\t h:i A') }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="{{ route('bookings.edit', $booking->id) }}" class="btn btn-warning">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </div>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal2">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Anna Reyes</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>Sneezing, runny nose, itchy eyes
-                                    </p>
-                                    <div class="mt-2">
-                                        <small class="text-muted"><i class="fas fa-prescription me-1"></i>Prescriptions:</small><br>
-                                        <span class="prescription-badge">Cetirizine 10mg</span>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Record 3 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Dental Check-up (Routine)</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>September 20, 2025</small>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal3">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Robert Lim</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>None - Routine examination
-                                    </p>
-                                    <p class="text-muted mb-0"><small>No prescriptions</small></p>
+                            @empty
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No appointment history yet. <a href="{{ route('book_appointment') }}">Book your first appointment</a>
                                 </div>
-                            </div>
-
-                            <!-- Record 4 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Annual Physical Examination</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>August 15, 2025</small>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal4">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Maria Santos</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>None - Routine check-up
-                                    </p>
-                                    <div class="mt-2">
-                                        <small class="text-muted"><i class="fas fa-prescription me-1"></i>Prescriptions:</small><br>
-                                        <span class="prescription-badge">Vitamin C 500mg</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Record 5 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Migraine</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>July 10, 2025</small>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal5">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Anna Reyes</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>Severe headache, sensitivity to light
-                                    </p>
-                                    <div class="mt-2">
-                                        <small class="text-muted"><i class="fas fa-prescription me-1"></i>Prescriptions:</small><br>
-                                        <span class="prescription-badge">Ibuprofen 400mg</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Record 6 -->
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="record-card">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <h5 class="mb-1">Stomach Flu (Gastroenteritis)</h5>
-                                            <small class="text-muted"><i class="far fa-calendar me-1"></i>June 5, 2025</small>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#recordModal6">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                    </div>
-                                    <p class="mb-2">
-                                        <i class="fas fa-user-md me-2 text-success"></i><strong>Dr. Robert Lim</strong>
-                                    </p>
-                                    <p class="mb-2">
-                                        <i class="fas fa-notes-medical me-2 text-info"></i>Nausea, vomiting, diarrhea
-                                    </p>
-                                    <div class="mt-2">
-                                        <small class="text-muted"><i class="fas fa-prescription me-1"></i>Prescriptions:</small><br>
-                                        <span class="prescription-badge">Oral Rehydration Solution</span>
-                                        <span class="prescription-badge">Loperamide 2mg</span>
-                                    </div>
-                                </div>
-                            </div>
-
+                            @endforelse
                         </div>
                     </div>
                 </div>

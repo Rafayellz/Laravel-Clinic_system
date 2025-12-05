@@ -17,7 +17,7 @@
         body {
             background-color: #f5f5f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        }   
         
         .sidebar {
             background-color: white;
@@ -214,27 +214,27 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link active" href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link active" href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_appointments') }}">  <!-- -->
-                <i class="bi bi-calendar-check"></i>
-                <span>Manage Appointments</span>
-            </a> 
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
+            <a class="nav-link " href="{{ route('admin_manage_users') }}">
                 <i class="bi bi-people"></i>
                 <span>Manage Users</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_reports') }}">  <!-- -->
-                <i class="bi bi-bar-chart"></i> 
+            <a class="nav-link" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
+                <i class="bi bi-calendar-check"></i>
+                <span>Manage Appointments</span>
+            </a>
+            <a class="nav-link" href="{{ route('doctor_reports') }}">  <!-- -->
+                <i class="bi bi-bar-chart"></i>     
                 <span>Reports</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
@@ -260,14 +260,21 @@
                     </div>
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=28a745&color=fff" alt="Admin" class="rounded-circle me-2" width="32" height="32">
-                            <span class="d-none d-md-inline">Admin User</span>
+                            <img src="https://ui-avatars.com/api/?name={{ Auth::user()->first_name }}&background=28a745&color=fff" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                            <span class="d-none d-md-inline">{{ Auth::user()->first_name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>  <!-- -->
-                            <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>  <!-- -->
-                            <li><hr class="dropdown-divider"></li> 
-                            <li><a class="dropdown-item" href="index.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item" style="background:none; border:none; cursor:pointer;">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -287,7 +294,7 @@
             </div>
         </div>
 
-        <!-- Appointment Stats -->
+       <!-- Appointment Stats -->
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="card stat-card">
@@ -295,12 +302,13 @@
                         <div class="stat-icon" style="background-color: rgba(40, 167, 69, 0.1); color: var(--primary-green);">
                             <i class="bi bi-calendar-day"></i>
                         </div>
-                        <div class="stat-value">24<span class="text-muted" style="font-size: 18px;">/50</span></div>
+                        <div class="stat-value">{{ $totalAppointments }}<span class="text-muted" style="font-size: 18px;">/50</span></div>
                         <div class="stat-label">Total Appointments Today</div>
                         <div class="progress mt-2" style="height: 6px; width: 100%;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 48%"></div>
+                            @php $percentage = min(($totalAppointments / 50) * 100, 100); @endphp
+                            <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $percentage; ?>%"></div>
                         </div>
-                        <small class="text-muted mt-1">26 slots remaining</small>
+                        <small class="text-muted mt-1">{{ 50 - $totalAppointments }} slots remaining</small>
                     </div>
                 </div>
             </div>
@@ -310,15 +318,15 @@
                         <h5 class="card-title">Appointment Status</h5>
                         <div class="appointment-status">
                             <div class="status-item">
-                                <div class="status-count text-warning">8</div>
+                                <div class="status-count text-warning">{{ $pendingCount }}</div>
                                 <div class="status-label">Pending</div>
                             </div>
                             <div class="status-item">
-                                <div class="status-count text-success">14</div>
+                                <div class="status-count text-success">{{ $approvedCount }}</div>
                                 <div class="status-label">Approved</div>
                             </div>
                             <div class="status-item">
-                                <div class="status-count text-danger">2</div>
+                                <div class="status-count text-danger">{{ $cancelledCount }}</div>
                                 <div class="status-label">Cancelled</div>
                             </div>
                         </div>
@@ -332,16 +340,16 @@
             <div class="card-body">
                 <h5 class="card-title">Quick Actions</h5>
                 <div class="quick-actions d-flex flex-wrap">
-                    <a href="{{ route('admin_announcement') }}" class="btn btn btn-outline-success">
+                    <a href="{{ route('doctor_announcement') }}" class="btn btn btn-outline-success">
                         <i class="bi bi-megaphone me-2"></i>Add Announcement
                     </a>
-                    <a href="{{ route('admin_add_medicine') }}" class="btn btn-outline-success">
+                    <a href="{{ route('doctor_add_medicine') }}" class="btn btn-outline-success">
                         <i class="bi bi-capsule me-2"></i>Add Medicine
                     </a>
-                    <a href="{{ route('admin_manage_appointments') }}" class="btn btn-outline-success">
+                    <a href="{{ route('doctor_manage_appointments') }}" class="btn btn-outline-success">
                         <i class="bi bi-calendar-check me-2"></i>Manage Appointments
                     </a>
-                    <a href="{{ route('admin_reports') }}" class="btn btn-outline-success">
+                    <a href="{{ route('doctor_reports') }}" class="btn btn-outline-success">
                         <i class="bi bi-bar-chart me-2"></i>Generate Report
                     </a>
                 </div>
@@ -355,7 +363,7 @@
                     <div class="card-body">
                         <h5 class="card-title d-flex justify-content-between align-items-center">
                             Recent Appointments
-                            <a href="{{ route('admin_manage_appointments') }}" class="btn btn-sm btn-outline-success">View All</a>
+                            <a href="{{ route('doctor_manage_appointments') }}" class="btn btn-sm btn-outline-success">View All</a>
                         </h5>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -368,36 +376,28 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>John Smith</td>
-                                        <td>Today, 10:30 AM</td>
-                                        <td>Medical Checkup</td>
-                                        <td><span class="badge badge-approved">Approved</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Maria Garcia</td>
-                                        <td>Today, 11:15 AM</td>
-                                        <td>Dental Consultation</td>
-                                        <td><span class="badge badge-pending">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Robert Johnson</td>
-                                        <td>Today, 2:00 PM</td>
-                                        <td>Vaccination</td>
-                                        <td><span class="badge badge-approved">Approved</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sarah Williams</td>
-                                        <td>Today, 3:30 PM</td>
-                                        <td>Eye Checkup</td>
-                                        <td><span class="badge badge-cancelled">Cancelled</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Michael Brown</td>
-                                        <td>Tomorrow, 9:00 AM</td>
-                                        <td>Medical Checkup</td>
-                                        <td><span class="badge badge-pending">Pending</span></td>
-                                    </tr>
+                                    @forelse($recentAppointments as $appointment)
+                                        <tr>
+                                            <td>{{ $appointment->user->first_name }} {{ $appointment->user->last_name }}</td>
+                                            <td>{{ $appointment->appointment_date->format('M d, Y') }}, {{ $appointment->formatted_time }}</td>
+                                            <td>{{ $appointment->service_name }}</td>
+                                            <td>
+                                                @if($appointment->status === 'pending')
+                                                    <span class="badge badge-pending">Pending</span>
+                                                @elseif($appointment->status === 'approved')
+                                                    <span class="badge badge-approved">Approved</span>
+                                                @elseif($appointment->status === 'rejected')
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                @else
+                                                    <span class="badge badge-info">{{ ucfirst($appointment->status) }}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">No appointments found</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -445,7 +445,7 @@
                     <div class="card-body">
                         <h5 class="card-title d-flex justify-content-between align-items-center">
                             Recent Announcements
-                            <a href="{{ route('admin_announcement') }}" class="btn btn-sm btn-outline-success">View All</a>
+                            <a href="{{ route('doctor_announcement') }}" class="btn btn-sm btn-outline-success">View All</a>
                         </h5>
                         <div class="list-group list-group-flush">
                             <a href="#" class="list-group-item list-group-item-action">
@@ -468,5 +468,7 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

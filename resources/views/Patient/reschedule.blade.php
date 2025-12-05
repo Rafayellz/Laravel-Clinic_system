@@ -160,12 +160,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('bookappointment') }}">
+                            <a class="nav-link" href="{{ route('book_appointment') }}">
                                 <i class="fas fa-calendar-plus"></i> Book Appointment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('myappointment') }}">
+                            <a class="nav-link" href="{{ route('my_appointment') }}">
                                 <i class="fas fa-calendar-check"></i> My Appointments
                             </a>
                         </li>
@@ -266,7 +266,7 @@
                                         </div>
 
                                         <div class="d-flex justify-content-end gap-2 mt-4">
-                                            <a href="{{ route('myappointment') }}" class="btn btn-secondary">Cancel</a>
+                                            <a href="{{ Auth::user()->role === 'admin' ? route('doctor_manage_appointments') : route('my_appointment') }}" class="btn btn-secondary">Cancel</a>
                                             <button type="submit" class="btn btn-primary-custom">
                                                 <i class="fas fa-save me-2"></i>Save Changes
                                             </button>
@@ -280,5 +280,7 @@
             </div>
         </div>
     </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -132,27 +132,23 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_appointments') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
                 <i class="bi bi-calendar-check"></i>
                 <span>Manage Appointments</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
-                <i class="bi bi-people"></i>
-                <span>Manage Users</span>
-            </a>
-            <a class="nav-link" href="{{ route('admin_reports') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_reports') }}">  <!-- -->
                 <i class="bi bi-bar-chart"></i>
                 <span>Reports</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link active" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link active" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
@@ -217,7 +213,7 @@
             <div class="card-body">
                 <h5 class="card-title d-flex justify-content-between align-items-center">
                     Recent Announcements
-                    <a href="announcements.html" class="btn btn-sm btn-outline-success">View All</a>
+                    <a href="doctor_announcement" class="btn btn-sm btn-outline-success">View All</a>
                 </h5>
                 
                 <!-- Announcement 1 -->
@@ -310,5 +306,7 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

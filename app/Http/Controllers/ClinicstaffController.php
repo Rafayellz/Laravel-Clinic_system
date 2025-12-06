@@ -7,19 +7,19 @@ use App\Models\Clinicstaff;
 
 class ClinicstaffController extends Controller
 {
-    public function staffgivemedicine(){
-        return view('staff_give_medicine');
+    public function staff_give_medicine(){
+        return view('Clinic Staff.staff_give_medicine');
     }
-    public function staffinventorymedicine(){
-        return view('staff_inventory_medicine');
+    public function staff_inventory_medicine(){
+        return view('Clinic Staff.staff_inventory_medicine');
     }
-    public function staffprofile(){
-        return view('staff_profile');
+    public function staff_profile(){
+        return view('Clinic Staff.staff_profile');
     }
-    public function staffnotifications(){
-        return view('staff_notifications');
+    public function staff_notifications(){
+        return view('Clinic Staff.staff_notifications');
     }
-    public function staffreports(){
-        return view('staff_reports');
+    public function staff_reports(){
+        return view('Clinic Staff.staff_reports');
     }
 }

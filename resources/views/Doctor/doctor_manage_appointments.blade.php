@@ -18,7 +18,7 @@
             background-color: #f5f5f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .sidebar {
             background-color: white;
             min-height: 100vh;
@@ -163,27 +163,23 @@
             <div class="logo-text mt-2 fw-bold text-success">DNSC Clinic</div>
         </div>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link " href="{{ route('admin_dashboard') }}">  <!-- -->
+            <a class="nav-link " href="{{ route('doctor_dashboard') }}">  <!-- -->
                 <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link active" href="{{ route('admin_manage_appointments') }}">  <!-- -->
+            <a class="nav-link active" href="{{ route('doctor_manage_appointments') }}">  <!-- -->
                 <i class="bi bi-calendar-check"></i>
                 <span>Manage Appointments</span>
             </a> 
-            <a class="nav-link" href="{{ route('admin_manage_users') }}">  <!-- -->
-                <i class="bi bi-people"></i>
-                <span>Manage Users</span>
-            </a>
-            <a class="nav-link" href="{{ route('admin_reports') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_reports') }}">  <!-- -->
                 <i class="bi bi-bar-chart"></i> 
                 <span>Reports</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_medicine_inventory') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_medicine_inventory') }}">  <!-- -->
                 <i class="bi bi-capsule"></i>
                 <span>Medicine Inventory</span>
             </a>
-            <a class="nav-link" href="{{ route('admin_announcement') }}">  <!-- -->
+            <a class="nav-link" href="{{ route('doctor_announcement') }}">  <!-- -->
                 <i class="bi bi-megaphone"></i>
                 <span>Announcements</span>
             </a>
@@ -210,7 +206,7 @@
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="https://ui-avatars.com/api/?name={{ Auth::user()->first_name }}&background=28a745&color=fff" alt="Admin" class="rounded-circle me-2" width="32" height="32">
-                            <span class="d-none d-md-inline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
+                            <span class="d-none d-md-inline">{{ Auth::user()->first_name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
@@ -232,7 +228,7 @@
 
     <!-- Filter Section -->
     <div class="filter-section">
-        <form method="GET" action="{{ route('admin_manage_appointments') }}">
+        <form method="GET" action="{{ route('doctor_manage_appointments') }}">
             <div class="row">
                 <div class="col-md-3">
                     <label for="dateFilter" class="form-label">Date</label>
@@ -295,7 +291,7 @@
                             @foreach($UserBooking as $booking)
                                 <tr>
                                     <td>
-                                        <strong>{{ $booking->user->first_name }} {{ $booking->user->last_name }}</strong>
+                                        <strong>{{ $booking->user->patient->first_name ?? 'N/A' }} {{ $booking->user->patient->last_name ?? 'N/A' }}</strong>
                                     </td>
                                     <td>{{ $booking->appointment_date->format('M d, Y') }}</td>
                                     <td>{{ $booking->formatted_time }}</td>
@@ -303,13 +299,25 @@
                                     <td>{{ $booking->service_name }}</td>
                                     <td>
                                         @if($booking->status === 'pending')
-                                            <span class="badge badge-pending">Pending</span>
+                                            <span style="display: inline-block; padding: 8px 12px; background-color: #fff8e1; color: #f57f17; border-radius: 5px; border-left: 4px solid #fbc02d; font-weight: 500;">
+                                                <i class="bi bi-clock-history me-1"></i>Pending
+                                            </span>
                                         @elseif($booking->status === 'approved')
-                                            <span class="badge badge-approved">Approved</span>
+                                            <span style="display: inline-block; padding: 8px 12px; background-color: #e8f5e9; color: #2e7d32; border-radius: 5px; border-left: 4px solid #28a745; font-weight: 500;">
+                                                <i class="bi bi-check-circle me-1"></i>Approved
+                                            </span>
                                         @elseif($booking->status === 'rejected')
-                                            <span class="badge bg-danger" style="padding: 8px 12px; border-radius: 5px; border: 2px solid #dc3545;">Rejected</span>
+                                            <span style="display: inline-block; padding: 8px 12px; background-color: #ffebee; color: #c62828; border-radius: 5px; border-left: 4px solid #dc3545; font-weight: 500;">
+                                                <i class="bi bi-x-circle me-1"></i>Rejected
+                                            </span>
+                                        @elseif($booking->status === 'rescheduled')
+                                            <span style="display: inline-block; padding: 8px 12px; background-color: #e3f2fd; color: #0066cc; border-radius: 5px; border-left: 4px solid #0066cc; font-weight: 500;">
+                                                <i class="bi bi-arrow-repeat me-1"></i>Rescheduled
+                                            </span>
                                         @else
-                                            <span class="badge badge-info">{{ ucfirst($booking->status) }}</span>
+                                            <span style="display: inline-block; padding: 8px 12px; background-color: #f5f5f5; color: #666; border-radius: 5px; border-left: 4px solid #999; font-weight: 500;">
+                                                {{ ucfirst($booking->status) }}
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="action-buttons">
@@ -325,9 +333,9 @@
                                             <a href="{{ route('bookings.reschedule-form', $booking->id) }}" class="btn btn-primary btn-sm">Reschedule</a>
                                         @else
                                             @if($booking->status !== 'rejected')
-                                                <a href="{{ route('bookings.reschedule-form', $booking->id) }}" class="btn btn-primary btn-sm">Reschedule</a>
+                                                <a href="{{ route('bookings.doctor_reschedule', $booking->id) }}" class="btn btn-primary btn-sm">Reschedule</a>
                                             @endif
-                                            <a href="give-medicine.html" class="btn btn-outline-info btn-sm"><i class="bi bi-capsule me-1"></i>Give Medicine</a>
+                                            <a href="" class="btn btn-outline-info btn-sm"><i class="bi bi-capsule me-1"></i>Give Medicine</a>
                                         @endif
                                     </td>
                                 </tr>

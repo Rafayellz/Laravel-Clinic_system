@@ -122,7 +122,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> {{ $user->first_name }} {{ $user->last_name}}
+                            <i class="fas fa-user-circle"></i> {{ $patient->first_name }} {{ $patient->last_name}}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
@@ -148,12 +148,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="{{ route('bookappointment') }}">
+                            <a class="nav-link active" href="{{ route('book_appointment') }}">
                                 <i class="fas fa-calendar-plus"></i> Book Appointment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('myappointment') }}">
+                            <a class="nav-link" href="{{ route('my_appointment') }}">
                                 <i class="fas fa-calendar-check"></i> My Appointments
                             </a>
                         </li>
@@ -173,7 +173,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html">
+                            <a class="nav-link" href="{{ route('logout') }}">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a>
                         </li>
@@ -245,8 +245,8 @@
                                         <label for="serviceType" class="form-label">Service Type</label>
                                         <select class="form-select" id="serviceType" name="service_type" required>
                                             <option value="" selected disabled>Select a service</option>
-                                            <option value="general">Medical Checkup</option>
-                                            <option value="dental">Health Concern</option>
+                                            <option value="Medical Checkup">Medical Checkup</option>
+                                            <option value="Health Concern">Health Concern</option>
                                         </select>
                                     </div>
                                     

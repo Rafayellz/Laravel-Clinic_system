@@ -168,11 +168,11 @@
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>
             </a> -->
-            <a class="nav-link  active" href="{{ route('staff_reports') }}">
+            <a class="nav-link  " href="{{ route('staff_reports') }}">
                 <i class="bi bi-bar-chart"></i>
                 <span>Reports</span>
             </a>
-            <a class="nav-link" href="{{ route('staff_notifications') }}">
+            <a class="nav-link active" href="{{ route('staff_notifications') }}">
                 <i class="bi bi-bell"></i>
                 <span>Notifications</span>
             </a>

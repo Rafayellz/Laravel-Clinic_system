@@ -85,6 +85,30 @@
             border-radius: 20px;
             font-size: 0.8rem;
         }
+
+        .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 12px;
+        margin-top: 8px;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        #passError {
+        display: block !important;
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        color: #dc3545;
+        }
         @media (max-width: 768px) {
             .sidebar {
                 min-height: auto;
@@ -107,13 +131,13 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> {{ $user->first_name }} {{ $user->last_name}}
+                            <i class="fas fa-user-circle"></i> {{ $patient->first_name }} {{ $patient->last_name}}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="index.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -133,12 +157,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('bookappointment') }}">
+                            <a class="nav-link" href="{{ route('book_appointment') }}">
                                 <i class="fas fa-calendar-plus"></i> Book Appointment
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('myappointment') }}">
+                            <a class="nav-link" href="{{ route('my_appointment') }}">
                                 <i class="fas fa-calendar-check"></i> My Appointments
                             </a>
                         </li>
@@ -158,10 +182,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </li>
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="nav-link" style="border: none; background: none; cursor: pointer; padding: 12px 20px; color: #333; display: block; width: 100%; text-align: left;">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
                     </ul>
                 </div>
             </div>
@@ -189,81 +216,81 @@
                             <div class="card-body">
                                 <div class="text-center mb-4">
                                     <img src="{{ asset('img/profile_justin.jpg') }}" alt="Profile" class="profile-img mb-3">
-                                    <h4>{{ $user->first_name }} {{ $user->last_name}}</h4>
-                                    <p class="text-muted">Student ID: {{ $user->id_number }}</p>
-                                    <p>
-                                        <span class="appointment-badge me-2">2 Upcomings</span>
-                                        <span class="appointment-badge">5 Completed</span>
-                                    </p>
+                                    <h4>{{ $patient->first_name }} {{ $patient->last_name}}</h4>
+                                    <p class="text-muted">Student ID: {{ $patient->id_number }}</p>
+                                    <p class="card-text">
+                                        <span class="appointment-badge me-2"> {{ $upcomingCount }} Upcoming</span>
+                                        <span class="appointment-badge">{{ $completedCount }} Completed</span>
+                                    </p>    
                                 </div>
-                                <form>
+                                <form action="{{ route('update_profile') }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="firstName" class="form-label">First Name</label>
-                                            <input type="text" class="form-control" id="firstName" value="{{ $user->first_name }}">
+                                            <input type="text" class="form-control" id="firstName" name="first_name" value="{{ $patient->first_name }}">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="lastName" class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" id="lastName" value="{{ $user->last_name }}">
+                                            <input type="text" class="form-control" id="lastName" name="last_name" value="{{ $patient->last_name }}">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="studentId" class="form-label">Student ID</label>
-                                            <input type="text" class="form-control" id="studentId" value="{{ $user->id_number }}">
+                                            <input type="text" class="form-control" id="studentId" name="id_number" value="{{ $patient->id_number }}">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="department" class="form-label">Institute</label>
-                                            <input type="text" class="form-control" id="department" value="{{ $user->institute }}">
+                                            <input type="text" class="form-control" id="department" name="institute" value="{{ $patient->institute }}">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label for="studentId" class="form-label">Height</label>
-                                            <input type="text" class="form-control" id="height" value="{{ $user->height }}" readonly>
+                                            <label for="height" class="form-label">Height</label>
+                                            <input type="text" class="form-control" id="height" name="height" value="{{ $patient->height }}">
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="department" class="form-label">Weight</label>
-                                            <input type="text" class="form-control" id="weight" value="{{ $user->weight }}">
+                                            <label for="weight" class="form-label">Weight</label>
+                                            <input type="text" class="form-control" id="weight" name="weight" value="{{ $patient->weight }}">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email" value="{{ $user->email }}">
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}">
                                         </div>
                                         <div class="col-md-6">
                                             <label for="phone" class="form-label">Phone Number</label>
-                                            <input type="tel" class="form-control" id="phone" value="{{ $user->phone_number }}">
+                                            <input type="tel" class="form-control" id="phone" name="phone_number" value="{{ $patient->phone_number }}">
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="address" class="form-label">Address</label>
-                                        <textarea class="form-control" id="address" rows="3">{{ $user->address }}</textarea>
+                                        <textarea class="form-control" id="address" name="address" rows="3">{{ $patient->address }}</textarea>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="birthdate" class="form-label">Date of Birth</label>
-                                            <input type="date" class="form-control" id="birthdate" value="2006-05-18">
+                                            <input type="date" class="form-control" id="birthdate" name="date_of_birth" value="{{ $patient->date_of_birth }}">
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="gender" class="form-label">Gender</label> <!-- parama fetch dapat ma connect sa sa vue-->
-                                            <select class="form-select" id="gender" v-model="gender">
-                                                <option :selected="$user->gender === 'male'">Male</option>
-                                                <option :selected="$user->gender === 'female'">Female</option>
-                                                <option :selected="$user->gender === 'other'">other</option>
-                                                <option :selected="$user->gender === 'Prefer not to say'">Prefer not to say</option>
+                                            <label for="gender" class="form-label">Gender</label>
+                                            <select class="form-select" id="gender" name="gender">
+                                                <option value="male" {{ $user->gender === 'male' ? 'selected' : '' }}>Male</option>
+                                                <option value="female" {{ $user->gender === 'female' ? 'selected' : '' }}>Female</option>
+                                                <option value="other" {{ $user->gender === 'other' ? 'selected' : '' }}>Other</option>
+                                                <option value="prefer_not_to_say" {{ $user->gender === 'prefer_not_to_say' ? 'selected' : '' }}>Prefer not to say</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="emergencyContact" class="form-label">Emergency Contact</label>
-                                        <input type="text" class="form-control" id="emergencyContact" value="{{ $user->emergency_cont }}">
+                                        <input type="text" class="form-control" id="emergencyContact" name="emergency_cont" value="{{ $patient->emergency_cont }}">
                                     </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                        <a href="dashboard.html" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
                                         <button type="submit" class="btn btn-primary-custom">Save Changes</button>
                                     </div>
                                 </form>
@@ -277,21 +304,28 @@
                                 Change Password
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form action="{{ route('change_password') }}" method="POST">
+                                    @csrf
                                     <div class="mb-3">
                                         <label for="currentPassword" class="form-label">Current Password</label>
-                                        <input type="password" class="form-control" id="currentPassword" placeholder="Enter your current password">
+                                        <input type="password" class="form-control" id="currentPassword" name="current_password" placeholder="Enter your current password" required>
                                     </div>
                                     <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label for="newPassword" class="form-label">New Password</label>
-                                            <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
-                                        </div>
+                                    <div class="col-md-6">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control @error('new_password') is-invalid @enderror" id="newPassword" name="new_password" placeholder="Enter new password" required>
+                                        @error('new_password')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
                                     </div>
+                                    <div class="col-md-6">
+                                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control @error('new_password_confirmation') is-invalid @enderror" id="confirmPassword" name="new_password_confirmation" placeholder="Confirm new password" required>
+                                        @error('new_password_confirmation')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                                         <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
                                         <button type="submit" class="btn btn-primary-custom">Update Password</button>

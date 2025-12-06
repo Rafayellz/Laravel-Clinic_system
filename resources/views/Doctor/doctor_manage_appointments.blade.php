@@ -18,7 +18,7 @@
             background-color: #f5f5f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .sidebar {
             background-color: white;
             min-height: 100vh;
